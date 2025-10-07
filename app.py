@@ -1,11 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from textblob import TextBlob
-from deep_translator import GoogleTranslator
+from googletrans import Translator
 import random
 
 app = Flask(__name__)
-CORS(app)
+# --- MUDANÇA FINAL AQUI ---
+# Dando permissão explícita para o seu site do frontend
+CORS(app, resources={r"/chat": {"origins": "https://rick09712.github.io"}})
 
 ultima_resposta_ia = ""
 
@@ -16,7 +18,7 @@ respostas = {
     "negativo": ["Puxa, que chato. Sinto muito por isso.", "Isso parece difícil. Lembre-se de ser gentil consigo mesmo.", "Lamento ouvir isso. Estou aqui se quiser desabafar."],
     "muito_negativo": ["Isso soa muito pesado. Por favor, cuide-se. Lembre-se que sentimentos são temporários.", "Sinto muito que esteja passando por isso.", "É válido se sentir assim. Quer me contar mais sobre a situação?"],
     "saudacao": ["Olá! Como você está se sentindo hoje?", "Oi! Sobre o que vamos conversar?", "E aí! Me conte o que está na sua mente."],
-    "identidade": ["Eu sou uma IA conversacional criada para explorar sentimentos.", "Pode me chamar de seu confidente digital. Eu analiso emoções."],
+    "identidade": ["Eu sou uma IA conversacional criada para explorar sentimentos. Minha função é ouvir e reagir à emoção nas suas palavras.", "Pode me chamar de seu confidente digital. Eu analiso emoções para tentar te entender melhor."],
     "clarificacao": ["Eu quis dizer que processei sua última mensagem. Minhas respostas são baseadas no sentimento que eu detecto.", "Minha resposta anterior foi baseada na emoção que senti nas suas palavras.", "Como uma IA, eu 'entendo' analisando os padrões no texto."]
 }
 
@@ -52,11 +54,10 @@ def conversar():
         return jsonify({"resposta": resposta_ia})
 
     try:
-        texto_em_ingles = GoogleTranslator(source='pt', target='en').translate(texto_usuario)
-        blob = TextBlob(texto_em_ingles)
+        traducao = translator.translate(texto_usuario, src='pt', dest='en')
+        blob = TextBlob(traducao.text)
         polaridade = blob.sentiment.polarity
-    except Exception as e:
-        print(f"Erro na tradução ou análise: {e}")
+    except Exception:
         polaridade = 0
 
     categoria_sentimento = "neutro"
@@ -70,6 +71,3 @@ def conversar():
     resposta_ia = random.choice(respostas[categoria_sentimento])
     ultima_resposta_ia = resposta_ia
     return jsonify({"resposta": resposta_ia})
-
-if __name__ == '__main__':
-    app.run(debug=True)
