@@ -5,11 +5,12 @@ from deep_translator import GoogleTranslator
 import random
 
 app = Flask(__name__)
-# Combinando as duas correções: CORS específico + biblioteca moderna
-CORS(app, resources={r"/chat": {"origins": "https://rick09712.github.io"}})
+# A MUDANÇA ESTÁ AQUI: Abrindo o CORS para qualquer origem
+CORS(app)
 
 ultima_resposta_ia = ""
 
+# O resto do código continua exatamente igual...
 respostas = {
     "muito_positivo": ["Que notícia fantástica! Fico radiante por você.", "Isso é absolutamente incrível!", "Maravilhoso! Continue com essa energia!"],
     "positivo": ["Fico feliz em ouvir isso. O que te deixou com esse sentimento bom?", "Isso é ótimo. Parece que você está em um bom caminho.", "Boas notícias! O que podemos fazer para manter essa sensação?"],
